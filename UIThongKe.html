@@ -1,0 +1,359 @@
+ <!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Thống kê DHTSHOP</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand+Pre:wght@400..700&family=Inter:opsz,wght@14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png"  href="web.ico">
+<style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .layout {
+      display: grid;
+      grid-template-areas:
+        "logo token"
+        "menu pair"
+        "menu table";
+      grid-template-columns: 160px 1fr;
+      grid-template-rows: 50px 1fr 1fr;
+      gap: 10px;
+      padding: 10px;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .logo { grid-area: logo; background: transparent; border-radius: 8px; padding: 10px; text-align: center; }
+    .token { grid-area: token; background: white; border-radius: 8px; padding: 10px; overflow: hidden !important; border: 1px solid #ccc;}
+    .menu { grid-area: menu; background: white; border-radius: 8px;  overflow: hidden;border: 1px solid #ccc; }
+    .pair { grid-area: pair; display: flex; gap: 10px; overflow: hidden; }
+    .content { flex: 1; background: white; border-radius: 8px; padding: 20px; overflow: hidden;border: 1px solid #ccc; }
+    .chart { flex: 1; background: white; border-radius: 8px; padding: 10px; overflow: hidden;border: 1px solid #ccc; }
+    .table { grid-area: table; background: #ffffff; border: 1px solid #ccc; padding: 20px; border-radius: 8px; overflow: hidden; }
+   
+ 
+
+  .chart-btn.active {
+    background-color: rgb(255, 166, 0);
+    color: rgb(12, 12, 12);
+   
+  }
+
+
+  </style>
+</head>
+<body>
+  <div class="layout">
+   <div class="logo">
+  <img src="logo.png" alt="">
+  <span class="logo-text">Dhtshop.vn</span>
+</div>
+
+
+
+    <div class="token">
+      <!-- <h2>2. Token</h2> -->
+      <!-- <label>🔐 Nhập Token:</label> -->
+      <div class="inline-token-group">
+        <label><i class="bi bi-shield-lock-fill"></i> Token:</label>
+
+  <input id="token" type="password" placeholder="Nhập token truy cập" />
+  <button onclick="saveToken()"><i class="bi bi-save"></i> Lưu</button>
+        <button onclick="clearToken()"><i class="bi bi-trash"></i> Xóa</button>
+  <div id="token-status" class="status"></div>
+</div>
+
+
+    </div>
+
+<div class="menu">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <!-- <button id="btnDashboard" onclick="setActiveMenu(this);gotoDashboard()" class="menu-btn">
+      <i class="bi bi-bar-chart-steps" style="margin-right: 6px;"></i>Dashboard
+    </button> -->
+    <button id="btnCombo" onclick="setActiveMenu(this);gotoComboStats()" class="menu-btn active">
+      <i class="bi bi-box-seam" style="margin-right: 6px;"></i>Combo Đại Lý
+    </button>
+    <button id="btnLinkCoffee" onclick="setActiveMenu(this);gotoLinkCoffeeStats()" class="menu-btn">
+      <i class="bi bi-cup-hot" style="margin-right: 6px;"></i>LinkCoffee
+    </button>
+    <button id="btnProductOrder" onclick="setActiveMenu(this);gotoProductOrderStats()" class="menu-btn">
+      <i class="bi bi-bag-check" style="margin-right: 6px;"></i>Đơn Sản Phẩm
+    </button>
+    <button id="btnSalesTree" onclick="setActiveMenu(this);gotoSalesTree()" class="menu-btn">
+      <i class="bi bi-diagram-3" style="margin-right: 6px;"></i>Cây Doanh Số
+    </button>
+  </div>
+   <img src="1.jpg" alt="Logo" style="width: 80%; margin: 380px auto 12px auto; display: block; border-radius: 8px;" />
+</div>
+
+
+
+    <div class="pair">
+      <div class="content">
+       
+       <!-- <div class="inline-select-group">
+  <label for="orderTypeDropdown">📅 Chọn loại đơn hàng:</label>
+  <select id="orderTypeDropdown" onchange="updateValidSkus()">
+    <option value="combo">Đơn Combo</option>
+    <option value="linkcoffee">Đơn LinkCoffee</option>
+    <option value="akira">Đơn Akira</option>
+  </select>
+</div>
+
+        
+       <div class="inline-date-group">
+  <label for="dateDropdown">📅 Chọn ngày mua hàng:</label>
+  <select id="dateDropdown">
+    <option value="">-- Nhấn 'Tải ngày' sau khi nhập token --</option>
+  </select>
+  <button onclick="loadDates()">📥</button>
+  <button onclick="exportOrders()">⬇️</button>
+</div>
+
+     
+       <div class="inline-week-group">
+  <label for="weekDropdown">📅 Chọn tuần mua hàng:</label>
+  <select id="weekDropdown">
+    <option value="">-- Nhấn 'Tải tuần' sau khi nhập token --</option>
+  </select>
+  <button onclick="loadWeeks()">📥</button>
+  <button onclick="exportOrdersByWeek()">⬇️</button>
+  <a id="downloadLink" style="display:none;">Download CSV</a>
+</div> -->
+<div class="chart-container"  style="width: 650px;">
+<div style="margin-top: -10px;"  id="chart-btn-container">
+  <button id="btn-sales" class="chart-btn active" onclick="showChart('sales')">Doanh thu theo đầu người</button>
+  <button id="btn-revenue" class="chart-btn" onclick="showChart('revenue')">Doanh thu theo thời gian</button>
+  <!-- <button onclick="downloadPersonalRevenueCSV()" class="chart-btn">
+  <i class="bi bi-file-earmark-arrow-down"></i> Tải danh số cá nhân
+</button> -->
+
+  <button id="btn-peronal" style="display: none;" class="chart-btn" onclick="showChart('tree')">Danh số cá nhân</button>
+  <button id="btn-revenueSystem" style="display: none;" class="chart-btn" onclick="showChart('revenueSystem')">Danh số hệ thống</button>
+  <button id="btn-revenueTeam" style="display: none;" class="chart-btn" onclick="showChart('revenueTeam')" >Doanh số đội nhóm</button>
+ 
+</div>
+
+  <canvas id="salesChart"
+  style="display: block; box-sizing: border-box; height: 200px; width: 650px; max-width: none;"></canvas>
+<canvas id="revenueChart"
+  style="display: none; box-sizing: border-box; height: 200px; width: 650px; max-width: none;"></canvas>
+
+  <canvas id="treeChart" style="display: block; box-sizing: border-box; height: 200px; width: 650px; max-width: none;"></canvas>
+  <canvas id="revenueSystemChart" style="display: none; box-sizing: border-box; height: 200px; width: 650px; max-width: none;"></canvas>
+   <canvas id="revenueTeamChart" style="display: none; box-sizing: border-box; height: 200px; width: 650px; max-width: none;"></canvas>
+
+</div>
+
+        </div>
+      <div class="chart">
+    
+    
+ <div class="inline-month-group">
+  <label>
+    <i class="bi bi-calendar3" style="margin-right: 6px;"></i>Thống kê:
+  </label>
+
+  <select id="statTypeDropdown" onchange="handleStatTypeChange()">
+    <option value="month">Tháng</option>
+    <option value="quarter">Quý</option>
+    <option value="year">Năm</option>
+  </select>
+
+  <select id="monthDropdown" style="display: inline-block;">
+    <option value="">-- Đang tải tháng --</option>
+  </select>
+
+  <select id="quarterDropdown" style="display: none;">
+    <option value="">-- Đang tải quý --</option>
+  </select>
+
+  <select id="yearDropdown" style="display: none;">
+    <option value="">-- Chọn năm --</option>
+  </select>
+
+  <button onclick="generateStatistics()"><i class="bi bi-bar-chart"></i></button>
+  <button onclick="downloadCSV()"><i class="bi bi-file-earmark-arrow-down"></i></button>
+</div>
+
+<div id="statistics"> 
+  <div class="stat-box" style="border-top-color:#f1c40f;">
+    <div class="stat-title">
+      Tổng số đơn hàng<i class="bi bi-box-seam"></i>
+    </div>
+    <div class="stat-value" id="totalComboOrders">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color: #2ecc71;">
+    <div class="stat-title">
+      Tổng tiền <i class="bi bi-cash-stack"></i>
+    </div>
+    <div class="stat-value" id="totalAmount">0 VND</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:  #3498db;">
+    <div class="stat-title">
+      Đơn thành công <i class="bi bi-check-circle"></i>
+    </div>
+    <div class="stat-value" id="totalSuccessOrders">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color: #e74c3c;">
+    <div class="stat-title">
+      Đơn hủy <i class="bi bi-x-circle"></i>
+    </div>
+    <div class="stat-value" id="totalCanceledOrders">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color: #e67e22;">
+    <div class="stat-title">
+      Tổng số người tham gia <i class="bi bi-people"></i>
+    </div>
+    <div class="stat-value" id="totalParticipants">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color: #8e44ad;">
+    <div class="stat-title">
+      % Người đạt ≥ 50 triệu <i class="bi bi-bar-chart-line"></i>
+    </div>
+    <div class="stat-value">
+      <span id="percentageAbove50M">0%</span>
+      <span class="stat-subtext" id="above50MInfo">(0/0)</span>
+    </div>
+  </div>
+</div>
+<div id="statisticsRevenue" style="display: none;">
+  <div class="stat-box" style="border-top-color:#16a085;">
+    <div class="stat-title">
+      Tổng DS cá nhân <i class="bi bi-bar-chart-fill"></i>
+    </div>
+    <div class="stat-value" id="totalPersonalRevenue">0 VND</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:#2980b9;">
+    <div class="stat-title">
+      Tổng số tài khoản <i class="bi bi-person-lines-fill"></i>
+    </div>
+    <div class="stat-value" id="totalAccounts">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:#d35400;">
+    <div class="stat-title">
+      Tỉ lệ tài khoản có giao dịch <i class="bi bi-percent"></i>
+    </div>
+    <div class="stat-value">
+      <span id="activeTransactionRate">0%</span>
+      <span class="stat-subtext" id="activeTransactionInfo">(0/0)</span>
+    </div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:#9b59b6;">
+    <div class="stat-title">
+      DS cá nhân ≥ 50 triệu <i class="bi bi-pie-chart-fill"></i>
+    </div>
+    <div class="stat-value" id="above50PercentPersonal">0</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:#c0392b;">
+    <div class="stat-title">
+      Người có ≥ 2 tầng HH <i class="bi bi-diagram-3-fill"></i>
+    </div>
+    <div class="stat-value" id="multiLevelUsers">0 Tài khoản</div>
+  </div>
+
+  <div class="stat-box" style="border-top-color:#34495e;">
+    <div class="stat-title">
+      Tổng lượng Maxout <i class="bi bi-boxes"></i>
+    </div>
+    <div class="stat-value" id="totalMaxout">0</div>
+  </div>
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="table">
+    
+      <input id="salesFilterInput" placeholder="Tìm kiếm..." style="margin:10px 0px; width: 550px; border-radius:5px;">
+
+      <input id="userFilterInput" placeholder="Tìm kiếm..." style="margin:10px 0px; width: 550px; border-radius:5px;display:none">
+   
+      <select id="sortSelect">
+    <option value="desc">Sắp xếp từ lớn đến bé</option>
+    <option value="asc">Sắp xếp từ bé đến lớn</option>
+    </select>
+
+
+  <select id="UsersortSelect" style="display:none">
+    <option >Sắp xếp theo LV</option>
+    <option >Sắp xếp theo số F1</option>
+    <option >Sắp xếp theo Độ ưu tiên</option>
+    <option >Sắp xếp theo DS hệ thống</option>
+    <option >Sắp xếp theo DS đội nhóm</option>
+    <option >Sắp xếp theo DS cá nhân</option>
+    <option >Sắp xếp theo Maxout</option>
+  </select>
+
+<!--       
+      <button class="btn_taixuong" onclick="downloadAllUsersAsCSV()"><i class="bi bi-file-earmark-arrow-down"></i>Tải xuống</button> -->
+ 
+      <table id="salesTable" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Số điện thoại</th>
+            <th>Họ và tên</th>
+            <th>Số đơn </th>
+            <th>Tổng giá trị (VND)</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table> 
+         <div id="salesPagination" class="pagination"></div>
+     
+     
+  <table id="userTable" style="margin-top:10px; border-collapse:collapse; display:none">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Số điện thoại</th>
+        <th>Họ và tên</th>
+        <th>Giới thiệu bởi</th>
+        <th>Level</th>
+        <th>Số F1</th>
+        <th>Độ Ưu Tiên</th>
+        <th>Danh Số Hệ Thống</th>
+        <th>Danh Số Đội Nhóm</th>
+        <th>Danh Số Cá Nhân</th>
+        <th>MaxOut</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dữ liệu render ở đây -->
+    </tbody>
+  </table>
+   <div id="userPagination" class="pagination" style="display: none;"></div>
+    </div>
+    
+ 
+
+  </div>
+
+ 
+</body>
+</html> 
