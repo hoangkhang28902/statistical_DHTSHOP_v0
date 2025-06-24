@@ -209,7 +209,7 @@
       }
     }
 
-    // ======== Xuất đơn hàng theo ngày =========
+// ======== Xuất đơn hàng theo ngày =========
 async function exportOrders() {
   const token = document.getElementById("token").value;
   const selectedDate = document.getElementById("dateDropdown").value;
@@ -2299,3 +2299,133 @@ function setActiveMenu(button) {
   // Gán active cho nút vừa bấm
   button.classList.add('active');
 }
+
+// Tải đơn
+
+async function downloadComboCSV() {
+  await downloadOrderCSV(comboSkus, "combo");
+}
+
+async function downloadLinkcoffeeCSV() {
+  await downloadOrderCSV(linkCoffeeSkus, "linkcoffee");
+}
+
+async function downloadAkiraCSV() {
+  const akiraSkus = await fetchAkiraSkus();
+  await downloadOrderCSV(akiraSkus, "akira");
+}
+
+async function downloadOrderCSV(validSkus, type) {
+  const token = document.getElementById("token").value;
+  if (!token) return alert("Vui lòng nhập token!");
+
+  try {
+    const res = await fetch("https://dhtshop.vn/api/admin/orders?page=1&limit=50000&status=all", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const json = await res.json();
+    const orders = json.data?.array || [];
+
+    const filteredOrders = orders.filter(order => {
+      const cart = JSON.parse(order.cartSnapshot || "[]");
+      return cart.some(product => validSkus.includes(product.productDetail?.sku));
+    });
+
+    const headers = [
+      "STT", "Mã đơn hàng", "Trạng thái", "Loại thanh toán", "Tổng tiền",
+      "Người duyệt",  "Họ và tên", "Tên sản phẩm", 
+      "Tổng số lượng sản phẩm", "Địa chỉ", "SĐT", "Ghi chú", "Ngày mua hàng"
+    ];
+
+    const rows = filteredOrders.map((item, idx) => {
+      const cart = JSON.parse(item.cartSnapshot || "[]");
+      let adminData = {};
+      try {
+        adminData = JSON.parse(item.admin || "{}");
+      } catch {}
+
+      // Tính tổng số lượng của tất cả sản phẩm trong đơn
+      const totalQuantity = cart.reduce((sum, product) => {
+        // Kiểm tra nếu quantity hợp lệ
+        const quantity = product.quantity || 0;
+        if (quantity <= 0 || quantity > 1000) {
+          console.warn(`Số lượng không hợp lệ cho sản phẩm ${product.productDetail?.name}: ${quantity}`);
+          return sum;  // Bỏ qua số lượng không hợp lệ
+        }
+        return sum + quantity;
+      }, 0);
+
+      // Làm sạch cột "Số lượng" để bỏ định dạng và chỉ lấy số nguyên
+      const quantities = cart.map(product => {
+        const quantity = product.quantity || 0;
+        return quantity.toString().replace(/[^0-9]/g, '');  // Loại bỏ ký tự không phải là số
+      }).join(", ");  // Nối các số lượng sản phẩm lại với nhau nếu có nhiều sản phẩm trong đơn
+
+      const totalAmount = item.totalAmount || 0;
+
+      return [
+        idx + 1,
+        
+        item.status || "",
+        item.walletName || "",
+        totalAmount,
+        adminData.full_name || "",
+        item.userPhone || "",
+        item.userFullName || "",
+        cart.map(product => product.productDetail?.name).join(", "), // Tên sản phẩm
+       
+        totalQuantity,  // Tổng số lượng của tất cả sản phẩm trong đơn
+        item.orderAddress || "",
+        item.orderPhone || "",
+        item.orderNote || "",
+        new Date(item.created_at).toLocaleString('vi-VN')
+      ];
+    });
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.map(field => `"${String(field).replace(/\"/g, '\"\"')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `orders_${type}_${Date.now()}.csv`;
+    a.click();
+  } catch (err) {
+    alert("Lỗi tải đơn hàng: " + err.message);
+  }
+}
+
+
+
+let is24Hour = false;  // Mặc định là 12 giờ
+
+function updateClock() {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+
+  let ampm = '';
+  if (!is24Hour) {
+    ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+  }
+
+  const hoursStr = String(hours).padStart(2, "0");
+  document.getElementById("clock").textContent = `${hoursStr}:${minutes}:${seconds}`;
+  document.getElementById("ampm").textContent = is24Hour ? '' : ampm;
+
+   // Cập nhật ngày
+  const day = now.getDate();
+  const month = now.getMonth() + 1; // Tháng bắt đầu từ 0, cộng thêm 1 để đúng
+  const year = now.getFullYear();
+  const dateStr = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+  document.getElementById("date").textContent = dateStr;
+}
+
+setInterval(updateClock, 1000);
+updateClock();  // Hiển thị giờ ngay lập tức khi tải trang

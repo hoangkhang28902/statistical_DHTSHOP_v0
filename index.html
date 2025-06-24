@@ -10,6 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Hand+Pre:wght@400..700&family=Inter:opsz,wght@14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png"  href="web.ico">
 <style>
@@ -33,7 +34,7 @@
       height: 100vh;
       box-sizing: border-box;
     }
-    .logo { grid-area: logo; background: transparent; border-radius: 8px; padding: 10px; text-align: center; }
+    .logo { grid-area: logo; background: transparent; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid #ccc;}
     .token { grid-area: token; background: white; border-radius: 8px; padding: 10px; overflow: hidden !important; border: 1px solid #ccc;}
     .menu { grid-area: menu; background: white; border-radius: 8px;  overflow: hidden;border: 1px solid #ccc; }
     .pair { grid-area: pair; display: flex; gap: 10px; overflow: hidden; }
@@ -94,7 +95,26 @@
       <i class="bi bi-diagram-3" style="margin-right: 6px;"></i>Cây Doanh Số
     </button>
   </div>
-   <img src="1.jpg" alt="Logo" style="width: 80%; margin: 380px auto 12px auto; display: block; border-radius: 8px;" />
+   <div class="clock-container-1">
+    <div class="clock-glass">
+        <i class="fas fa-calendar"></i>
+      
+     
+      <div id="date">--</div> <!-- Thêm phần hiển thị ngày -->
+   
+    </div>
+  </div>
+   <div class="clock-container">
+    <div class="clock-glass">
+       <i class="fas fa-clock"></i>
+      <div id="clock">--:--:--</div>
+      <div id="ampm">--</div>
+     
+      
+   
+    </div>
+  </div>
+   <img src="1.jpg" alt="Logo" style="width: 120%; margin: 320px auto 20px auto; display: block; border-radius: 8px; margin-left:-10px;" />
 </div>
 
 
@@ -102,35 +122,7 @@
     <div class="pair">
       <div class="content">
        
-       <!-- <div class="inline-select-group">
-  <label for="orderTypeDropdown">📅 Chọn loại đơn hàng:</label>
-  <select id="orderTypeDropdown" onchange="updateValidSkus()">
-    <option value="combo">Đơn Combo</option>
-    <option value="linkcoffee">Đơn LinkCoffee</option>
-    <option value="akira">Đơn Akira</option>
-  </select>
-</div>
-
-        
-       <div class="inline-date-group">
-  <label for="dateDropdown">📅 Chọn ngày mua hàng:</label>
-  <select id="dateDropdown">
-    <option value="">-- Nhấn 'Tải ngày' sau khi nhập token --</option>
-  </select>
-  <button onclick="loadDates()">📥</button>
-  <button onclick="exportOrders()">⬇️</button>
-</div>
-
-     
-       <div class="inline-week-group">
-  <label for="weekDropdown">📅 Chọn tuần mua hàng:</label>
-  <select id="weekDropdown">
-    <option value="">-- Nhấn 'Tải tuần' sau khi nhập token --</option>
-  </select>
-  <button onclick="loadWeeks()">📥</button>
-  <button onclick="exportOrdersByWeek()">⬇️</button>
-  <a id="downloadLink" style="display:none;">Download CSV</a>
-</div> -->
+ 
 <div class="chart-container"  style="width: 650px;">
 <div style="margin-top: -10px;"  id="chart-btn-container">
   <button id="btn-sales" class="chart-btn active" onclick="showChart('sales')">Doanh thu theo đầu người</button>
@@ -183,8 +175,39 @@
     <option value="">-- Chọn năm --</option>
   </select>
 
-  <button onclick="generateStatistics()"><i class="bi bi-bar-chart"></i></button>
-  <button onclick="downloadCSV()"><i class="bi bi-file-earmark-arrow-down"></i></button>
+  <button onclick="generateStatistics()" title="Thống kê" ><i class="bi bi-bar-chart"></i></button>
+  <!--Nút tải xuống 
+  <button onclick="downloadCSV()"><i class="bi bi-file-earmark-arrow-down"></i></button>-->
+
+ <!-- Nút tải xuống đơn akira -->
+<button style="background-color: #FF5733; color: white;" 
+        title="Tải xuống đơn Akira" 
+        onclick="downloadAkiraCSV()">
+  <i class="bi bi-file-earmark-arrow-down"></i> 
+</button>
+
+<!-- Nút tải xuống đơn linkcoffee -->
+<button style="background-color: #1E90FF; color: white;" 
+        title="Tải xuống đơn LinkCoffee" 
+        onclick="downloadLinkcoffeeCSV()">
+  <i class="bi bi-file-earmark-arrow-down"></i> 
+</button>
+
+<!-- Nút tải xuống đơn combo -->
+<button style="background-color: #32CD32; color: white;" 
+        title="Tải xuống đơn Combo" 
+        onclick="downloadComboCSV()">
+  <i class="bi bi-file-earmark-arrow-down"></i>
+</button>
+
+<!-- Nút tải xuống user -->
+<button style="background-color: #FFD700; color: white;" 
+        title="Tải xuống danh sách người dùng" 
+        onclick="downloadAllUsersAsCSV()">
+  <i class="bi bi-file-earmark-arrow-down"></i> 
+</button>
+
+
 </div>
 
 <div id="statistics"> 
@@ -350,9 +373,37 @@
    <div id="userPagination" class="pagination" style="display: none;"></div>
     </div>
     
- 
+<!-- 
+  
+<div class="inline-select-group" style="display: none;">
+  <label for="orderTypeDropdown">📅 Chọn loại đơn hàng:</label>
+  <select id="orderTypeDropdown" onchange="updateValidSkus()">
+    <option value="combo">Đơn Combo</option>
+    <option value="linkcoffee">Đơn LinkCoffee</option>
+    <option value="akira">Đơn Akira</option>
+  </select>
+</div>
+       
+       <div class="inline-date-group">
+  <label for="dateDropdown">📅 Chọn ngày mua hàng:</label>
+  <select id="dateDropdown">
+    <option value="">-- Nhấn 'Tải ngày' sau khi nhập token --</option>
+  </select>
+  <button onclick="loadDates()">📥</button>
+  <button onclick="exportOrders()">⬇️</button>
+</div>
 
-  </div>
+     
+  <div class="inline-week-group">
+  <label for="weekDropdown">📅 Chọn tuần mua hàng:</label>
+  <select id="weekDropdown">
+    <option value="">-- Nhấn 'Tải tuần' sau khi nhập token --</option>
+  </select>
+  <button onclick="loadWeeks()">📥</button>
+  <button onclick="exportOrdersByWeek()">⬇️</button>
+  <a id="downloadLink" style="display:none;">Download CSV</a>
+</div>
+</div> -->
 
  
 </body>
