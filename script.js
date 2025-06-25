@@ -2366,12 +2366,12 @@ async function downloadOrderCSV(validSkus, type) {
 
       return [
         idx + 1,
-        
+        item.orderId || "",
         item.status || "",
         item.walletName || "",
         totalAmount,
         adminData.full_name || "",
-        item.userPhone || "",
+       
         item.userFullName || "",
         cart.map(product => product.productDetail?.name).join(", "), // Tên sản phẩm
        
