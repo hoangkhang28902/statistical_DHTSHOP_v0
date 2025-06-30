@@ -1,17 +1,17 @@
 
     // ======== Token Handling =========
-    function saveToken() {
-  const token = document.getElementById("token").value;
-  if (!token) return alert("Vui lòng nhập token");
-  setTokenInCookie(token);  // Lưu token vào cookie thay vì localStorage
-  checkTokenValidity(token);
-}
+ function saveToken() {
+      const token = document.getElementById("token").value;
+      if (!token) return alert("Vui lòng nhập token");
+      localStorage.setItem("dht_token", token);
+      checkTokenValidity(token);
+    }
 
-function clearToken() {
-  clearTokenFromCookie();  // Xóa token khỏi cookie thay vì localStorage
-  document.getElementById("token").value = "";
-  document.getElementById("token-status").textContent = "Đã xóa token.";
-}
+    function clearToken() {
+      localStorage.removeItem("dht_token");
+      document.getElementById("token").value = "";
+      document.getElementById("token-status").textContent = "Đã xóa token.";
+    }
     function loadSavedToken() {
       const token = localStorage.getItem("dht_token");
       if (token) {
