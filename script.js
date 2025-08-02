@@ -39,7 +39,7 @@
     loadSavedToken();
 
     // ======== SKU của Combo, LinkCoffee, Akira =========
-    const comboSkus = ["CB-2.5", "CB-5.0", "CB-15", "CB-35", "CB-75", "Cb-150", "CB-300"];
+    const comboSkus = ["CB-2.5", "CB-5.0", "CB-15", "CB-35", "CB-75", "Cb-150", "CB-300","cb_spa"];
     const linkCoffeeSkus = [
       "DHT_ComTrua", "DHT_BlackCoffee", "DHT-MilkCoffee", "DHT_VietnameseWhiteCoffeeIced",
       "DHT_SaltedCream", "DHT_SaltedCreamCoffee", "DHT_CoconutPandanLatte", "DHT_PandanCoconutMilkTea",
